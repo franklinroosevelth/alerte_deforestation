@@ -145,14 +145,59 @@
             </ul>
           </div>
         </nav>
+        {% if status == 0 %}
+        <form action="{% url "accueil" %}" method="POSt" style="display:none;">
+        {% else %}
+        <form action="{% url "accueil" %}" method="POSt">
+        {% endif %}
+        
+          {% csrf_token %}
+          <select name="lieu" id="" class="form-control" style="width:90%;">
+            <option value="Bas-Uele">Bas-Uele</option>
+            <option value="Équateur">Équateur</option>
+            <option value="Haut-Katanga">Haut-Katanga</option>
+            <option value="Haut-Lomami">Haut-Lomami</option>
+            <option value="Haut-Uele">Haut-Uele</option>
+            <option value="Ituri">Ituri</option>
+            <option value="Kasaï">Kasaï</option>
+            <option value="Kasaï central">Kasaï central</option>
+            <option value="Kasaï oriental">Kasaï oriental</option>
+            <option value="Kinshasa">Kinshasa</option>
+            <option value="Kongo-Central">Kongo-Central</option>
+            <option value="Kwango">Kwango</option>
+            <option value="Kwilu">Kwilu</option>
+            <option value="Lomami">Lomami</option>
+            <option value="Lualaba">Lualaba</option>
+            <option value="Mai-Ndombe">Mai-Ndombe</option>
+            <option value="Maniema">Maniema</option>
+            <option value="Mongala">Mongala</option>
+            <option value="Nord-Kivu">Nord-Kivu</option>
+            <option value="Nord-Ubangi">Nord-Ubangi</option>
+            <option value="Sankuru">Sankuru</option>
+            <option value="Sud-Kivu">Sud-Kivu</option>
+            <option value="Sud-Ubangi">Sud-Ubangi</option>
+            <option value="Tanganyika">Tanganyika</option>
+            <option value="Tshopo">Tshopo</option>
+            <option value="Tshuapa">Tshuapa</option>
+          </select>
+          <input type="submit" value="Rechercher le lieu" class="btn btn-secondary">
+        </form>
+        <br>
       </header>
       <!--  Header End -->
-      <div>
-        <div class="div_camera">
-          <video id="video" width="520" height="440" autoplay></video><br/>
-          <button id="click-photo" class="btn btn-primary">Cacher la camera</button>
+      {% if status == 0 %}
+      <div style="display:none;" class="div_maps">
+      {% else %}
+        <div style="" class="div_maps">
+      {% endif %}
+        <div >
+            <iframe class="rounded" style="width:90%; height: 500px;"  id="googleMapIframe" 
+            
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d387191.33750346623!2d{{longitude}}!3d{{latitude}}!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!!5e0!3m2!1sen!2sus!4v1694259649153!5m2!1sen!2sus"
+            allowfullscreen=""
+            ></iframe>
+          <!-- <button id="click-photo" class="btn btn-primary">Cacher la camera</button> -->
         </div>
-        <canvas id="canvas" width="320" height="240"></canvas>
       </div>
       <div class="container-fluid">
         <!--  Row 1 -->
@@ -190,7 +235,7 @@
                     <tbody>
                       {% for alert in alertes %}
                       <tr>
-                        <td class="border-bottom-0"><h6 class="fw-semibold mb-0">{{alert.id}}</h6></td>
+                        <td class="border-bottom-0"><h6 class="fw-semibold mb-0">{{forloop.counter}}</h6></td>
                         <td class="border-bottom-0">
                           <!--h6 class="fw-semibold mb-1">Sunil Joshi</h6-->
                           <span class="fw-normal">{{alert.taux}}%</span>                          
@@ -207,15 +252,17 @@
                         </td>
                         <td class="border-bottom-0">
                           {% if alert.etat %}
-                          <p class="mb-0 fw-normal">Non signalé</p>
-                          {% else %}
                           <p class="mb-0 fw-normal">Signalé</p>
+                          {% else %}
+                          <p class="mb-0 fw-normal">Non signalé</p>
                           {% endif %}
                         </td>
                         <td class="border-bottom-0">
-                          {% if alert.etat %}
-                          <span class="btn btn-primary" style="background:#cc0000; border:0">Signaler</span>                          
+                          <a href="{% url 'detail_alerte' %}?pk={{alert.id}}" style="color:blue;text-decoration:underline">Afficher</a>&nbsp
+                          {% if not alert.etat %}
+                          <a href="{% url 'signaler_alerte' %}?pk={{alert.id}}" style="color:red;text-decoration:underline">Signaler</span>                          
                           {% endif %}
+                          
                         </td>
                       </tr> 
                       {% endfor %}              
@@ -247,31 +294,15 @@
     let canvas = document.querySelector("#canvas");
 
     camera_button.addEventListener('click', async function() {
-        $('.div_camera').show(100);
-        let stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
-      video.srcObject = stream;
+        $('.div_maps').toggle(100);
+        $('form').toggle(100);
+        
     });
 
     click_button.addEventListener('click', function() {
-        $('.div_camera').hide(100);
+        //$('.div_camera').hide(100);
     });
 
-    setInterval(function(){
-      canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
-      let image_data_url = canvas.toDataURL('image/jpeg');
-      //$("#canvas").hide();
-      $.ajax({
-                type:"POST",
-                url: "{% url 'save_capture' %}",
-                dataType:"json",
-                data:{base64:image_data_url, csrfmiddlewaretoken:"{{csrf_token}}"},
-                success: function(response) 
-                {
-                    console.log(response);
-                }
-            });
-
-    }, 18000000);//30min
   </script>
 </body>
 

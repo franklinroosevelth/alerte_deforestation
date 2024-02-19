@@ -4,6 +4,8 @@ from .models import *
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.hashers import make_password
 from django.http import JsonResponse
+import requests
+
 # Create your views here.
 #Se connecter
 def se_connecter(request):
@@ -25,8 +27,39 @@ def se_deconnecter(request):
 
 def home_page(request):
     alertes = Alerte.objects.all().order_by('-id')
-    return render(request, "index.html", {"alertes": alertes})
+    latitude = 1.7749
+    longitude = -1.4194
+    status = 0
+    if request.method == 'POST':
+        lieu = request.POST.get('lieu')
+        url = 'https://nominatim.openstreetmap.org/search?format=json&q=' + lieu
+        response = requests.get(url)
+        if response.status_code == 200:
+            data = response.json()
+            if data:
+                latitude = data[0]['lat']
+                longitude = data[0]['lon']
+        status = 1
+
+    return render(request, "index.html", {"alertes": alertes, "latitude":latitude, "longitude":longitude, "status":status})
  
+
+def detail_alerte(request):
+    pk = request.GET.get('pk')
+    alerte = Alerte.objects.filter(pk=pk).first()
+    return render(request, "detail_alerte.html", {"alerte": alerte})
+
+def signaler_alerte(request):
+    pk = request.GET.get('pk')
+    alerte = Alerte.objects.filter(pk=pk).first()
+    alerte.etat = True
+    alerte.save()
+    alertes = Alerte.objects.all().order_by('-id')
+    latitude = 1.7749
+    longitude = -1.4194
+    status = 0
+    return render(request, "index.html", {"alertes": alertes, "latitude":latitude, "longitude":longitude, "status":status})
+
 def capture_page(request):
     captures = Capture.objects.all().order_by('-id')
     return render(request, "captures.html", {"captures": captures})

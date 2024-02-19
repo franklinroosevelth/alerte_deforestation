@@ -23,6 +23,8 @@ urlpatterns = [
     path('', TemplateView.as_view(template_name='authentication-login.html'), name="login_page"),
     path('confirmer_action', TemplateView.as_view(template_name='authentication-login.html'), name="confirmer_action"),
     path('accueil', home_page, name="accueil"),
+    path('detail_alerte', detail_alerte, name="detail_alerte"),
+    path('signaler_alerte', signaler_alerte, name="signaler_alerte"),
     path('capture', capture_page, name="capture"),
     path('login', se_connecter, name="login"),
     path('logout', se_deconnecter, name="logout"),

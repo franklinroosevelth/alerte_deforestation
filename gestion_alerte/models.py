@@ -74,6 +74,8 @@ class Alerte(models.Model):
     taux = models.FloatField(default=0)
     etat = models.BooleanField(default=False)
     create_date = models.DateTimeField(auto_now_add=True)
+    longitude = models.FloatField(default=0)
+    latitude = models.FloatField(default=0)
     
     def __str__(self):
         return str(self.create_date)

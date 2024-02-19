@@ -1,44 +1,59 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Google Maps Example</title>
-  <script src="https://maps.googleapis.com/maps/api/js?libraries=places" defer></script>
-  <style>
-    #map {
-      height: 400px;
-      width: 100%;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Afficher des Points sur une Carte Google Maps</title>
+    <script src="https://maps.googleapis.com/maps/api/js?key=2zNDjCsDU4JzU2LjAiTiAywrAzMicwMC4zIlc&callback=initMap" async defer></script>
+    <style>
+        #map {
+            height: 400px;
+            width: 100%;
+        }
+    </style>
 </head>
 <body>
-  <div id="map"></div>
 
-  <script>
+<div id="map"></div>
+
+<script>
     function initMap() {
-      const center = { lat: 37.7749, lng: -122.4194 };
-      const mapOptions = {
-        zoom: 12,
-        center: center,
-      };
-      const map = new google.maps.Map(document.getElementById('map'), mapOptions);
+        // Coordonnées des points à afficher
+        var points = [
+            { lat: 40.7128, lng: -74.0060, title: 'New York, USA' },
+            { lat: 34.0522, lng: -118.2437, title: 'Los Angeles, USA' },
+            { lat: 51.5074, lng: -0.1278, title: 'London, UK' }
+            // Ajoutez autant de points que nécessaire
+        ];
 
-      const locations = [
-        { lat: 37.7749, lng: -122.4194, title: 'San Francisco' },
-        { lat: 34.0522, lng: -118.2437, title: 'Los Angeles' },
-      ];
+        // Options de la carte
+        var mapOptions = {
+            center: { lat: 0, lng: 0 },
+            zoom: 2
+        };
 
-      locations.forEach(location => {
-        const marker = new google.maps.Marker({
-          position: { lat: location.lat, lng: location.lng },
-          map: map,
-          title: location.title,
+        // Création de la carte
+        var map = new google.maps.Map(document.getElementById('map'), mapOptions);
+
+        // Ajout des marqueurs pour chaque point
+        points.forEach(function(point) {
+            var marker = new google.maps.Marker({
+                position: { lat: point.lat, lng: point.lng },
+                map: map,
+                title: point.title
+            });
+
+            // Ajouter une info-bulle au marqueur
+            var infowindow = new google.maps.InfoWindow({
+                content: point.title
+            });
+
+            marker.addListener('click', function() {
+                infowindow.open(map, marker);
+            });
         });
-      });
     }
+</script>
 
-    google.maps.event.addDomListener(window, 'load', initMap);
-  </script>
 </body>
 </html>
